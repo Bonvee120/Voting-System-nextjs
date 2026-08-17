@@ -1,40 +1,62 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/pages/api-reference/create-next-app).
+# Africa Plan Foundation — Head of Cohort Voting System
 
-## Getting Started
+A frontend voting application built for the Africa Plan Foundation Head of Cohort election.
 
-First, run the development server:
+The application allows a fixed group of 20 voters to cast one vote each for a candidate. Candidates can be entered manually, votes are tracked in real time, voting automatically closes after all 20 voters have voted, and the two candidates with the highest votes are presented as Head of Cohort and Assistant Head of Cohort.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## 🚀 Features
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- 20 predefined voters
+- Voter selection through a dropdown
+- One vote per voter
+- Voters are automatically removed from the dropdown after voting
+- Candidates can be entered manually
+- Candidate names are normalized to prevent duplicate candidates caused by capitalization
+- Real-time candidate vote counts
+- Live voting progress indicator
+- Automatic election closure at 20 votes
+- Voting form becomes disabled after the election closes
+- Winner calculation based on the highest vote counts
+- Head of Cohort and Assistant Head of Cohort results
+- Vote percentages displayed in the results modal
+- Tie detection
+- Winners displayed in a modal
+- Election data persists after browser refresh using `localStorage`
+- Responsive interface
+- Reset functionality planned for clearing the current election
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
+## 🛠️ Tech Stack
 
-[API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
+- **Next.js** — React framework using the Pages Router
+- **React** — UI development
+- **TypeScript** — Type-safe development
+- **Tailwind CSS** — Styling
+- **TanStack React Query** — Included in the project setup for future data/query management
+- **React Icons** — Icons
+- **localStorage** — Frontend persistence
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) instead of React pages.
+## 📁 Project Structure
 
-This project uses [`next/font`](https://nextjs.org/docs/pages/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn-pages-router) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/pages/building-your-application/deploying) for more details.
+```text
+src/
+├── components/
+│   └── voting/
+│       └── WinnersModal.tsx
+│
+├── data/
+│   └── voters.ts
+│
+├── layout/
+│   ├── footer.tsx
+│   ├── layout.tsx
+│   └── navbar.tsx
+│
+├── pages/
+│   ├── _app.tsx
+│   └── index.tsx
+│
+├── styles/
+│   └── globals.css
+│
+└── types/
+    └── voting.ts

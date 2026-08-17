@@ -1,82 +1,349 @@
-import Image from "next/image";
-import { Geist, Geist_Mono } from "next/font/google";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+import { useEffect, useState } from "react";
+import { voters } from "@/types/voters";
+import type { Candidate } from "@/types/voting";
+import WinnersModal from "@/components/voting/WinnersModal";
 
 export default function Home() {
+  const [selectedVoter, setSelectedVoter] = useState("");
+  const [candidate, setCandidate] = useState("");
+  const [candidates, setCandidates] = useState<Candidate[]>([]);
+  const [votedVoterIds, setVotedVoterIds] = useState<number[]>([]);
+  const [isWinnerModalOpen, setIsWinnerModalOpen] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  // Load saved election data when the page opens
+  useEffect(() => {
+    const savedCandidates = localStorage.getItem("electionCandidates");
+    const savedVoterIds = localStorage.getItem("votedVoterIds");
+
+    if (savedCandidates) {
+      setCandidates(JSON.parse(savedCandidates));
+    }
+
+    if (savedVoterIds) {
+      setVotedVoterIds(JSON.parse(savedVoterIds));
+    }
+
+    setIsLoaded(true);
+  }, []);
+
+  // Save candidates whenever they change
+  useEffect(() => {
+    if (!isLoaded) return;
+
+    localStorage.setItem(
+      "electionCandidates",
+      JSON.stringify(candidates)
+    );
+  }, [candidates, isLoaded]);
+
+  // Save voters who have voted whenever they change
+  useEffect(() => {
+    if (!isLoaded) return;
+
+    localStorage.setItem(
+      "votedVoterIds",
+      JSON.stringify(votedVoterIds)
+    );
+  }, [votedVoterIds, isLoaded]);
+
+  const isVotingOpen = votedVoterIds.length < 20;
+
+  const sortedCandidates = [...candidates].sort(
+    (a, b) => b.votes - a.votes
+  );
+
+  const winner = sortedCandidates[0];
+  const runnerUp = sortedCandidates[1];
+
+  const hasTie =
+    sortedCandidates.length >= 2 &&
+    sortedCandidates[0].votes === sortedCandidates[1].votes;
+
+  const handleVote = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    if (!isVotingOpen) {
+      alert("Voting has ended. All 20 voters have voted.");
+      return;
+    }
+
+    if (!selectedVoter) {
+      alert("Please select your name.");
+      return;
+    }
+
+    const candidateName = candidate.trim();
+
+    if (!candidateName) {
+      alert("Please enter a candidate name.");
+      return;
+    }
+
+    const voterId = Number(selectedVoter);
+
+    if (votedVoterIds.includes(voterId)) {
+      alert("This voter has already voted.");
+      return;
+    }
+
+    const normalizedCandidate = candidateName.toLowerCase();
+
+    setCandidates((currentCandidates) => {
+      const existingCandidate = currentCandidates.find(
+        (item) =>
+          item.name.toLowerCase() === normalizedCandidate
+      );
+
+      if (existingCandidate) {
+        return currentCandidates.map((item) =>
+          item.name.toLowerCase() === normalizedCandidate
+            ? {
+                ...item,
+                votes: item.votes + 1,
+              }
+            : item
+        );
+      }
+
+      return [
+        ...currentCandidates,
+        {
+          name: candidateName,
+          votes: 1,
+        },
+      ];
+    });
+
+    setVotedVoterIds((currentIds) => [
+      ...currentIds,
+      voterId,
+    ]);
+
+    setSelectedVoter("");
+    setCandidate("");
+
+    alert("Vote submitted successfully.");
+  };
+
   return (
-    <div
-      className={`${geistSans.variable} ${geistMono.variable} flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black`}
-    >
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              index.tsx
-            </code>{" "}
-            file.
+    <section className="min-h-[calc(100vh-9rem)] px-6 py-12">
+      <div className="mx-auto max-w-5xl">
+
+        {/* Page Heading */}
+        <div className="mb-10 text-center">
+          <p className="mb-2 text-sm font-semibold uppercase tracking-widest text-[#7C2D12]">
+            Africa Plan Foundation
+          </p>
+
+          <h1 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+            Head of Cohort Election
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+
+          <p className="mx-auto mt-3 max-w-xl text-gray-600">
+            Cast your vote.
           </p>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs/pages/getting-started?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+
+        {/* Voting Form */}
+        <div className="mx-auto max-w-2xl rounded-2xl bg-white p-6 shadow-lg ring-1 ring-gray-200 sm:p-8">
+          <div className="mb-7">
+            <h2 className="text-xl font-bold text-gray-900">
+              Cast Your Vote
+            </h2>
+
+            <p className="mt-1 text-sm text-gray-500">
+              Select your name and enter the candidate you want to vote for.
+            </p>
+          </div>
+
+          <form onSubmit={handleVote} className="space-y-6">
+
+            {/* Voter */}
+            <div>
+              <label
+                htmlFor="voter"
+                className="mb-2 block text-sm font-semibold text-gray-800"
+              >
+                Select Voter
+              </label>
+
+              <select
+                id="voter"
+                value={selectedVoter}
+                disabled={!isVotingOpen}
+                onChange={(event) =>
+                  setSelectedVoter(event.target.value)
+                }
+                className="h-12 w-full rounded-lg border border-gray-300 bg-white px-4 text-sm text-gray-900 outline-none transition focus:border-[#7C2D12] focus:ring-2 focus:ring-[#7C2D12]/20 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-400"
+              >
+                <option value="">
+                  Select your name
+                </option>
+
+                {voters
+                  .filter(
+                    (voter) =>
+                      !votedVoterIds.includes(voter.id)
+                  )
+                  .map((voter) => (
+                    <option
+                      key={voter.id}
+                      value={voter.id}
+                    >
+                      {voter.name}
+                    </option>
+                  ))}
+              </select>
+            </div>
+
+            {/* Candidate */}
+            <div>
+              <label
+                htmlFor="candidate"
+                className="mb-2 block text-sm font-semibold text-gray-800"
+              >
+                Candidate
+              </label>
+
+              <input
+                id="candidate"
+                type="text"
+                value={candidate}
+                disabled={!isVotingOpen}
+                onChange={(event) =>
+                  setCandidate(event.target.value)
+                }
+                placeholder="Enter candidate name"
+                className="h-12 w-full rounded-lg border border-gray-300 bg-white px-4 text-sm text-gray-900 outline-none transition placeholder:text-gray-400 focus:border-[#7C2D12] focus:ring-2 focus:ring-[#7C2D12]/20 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-400"
+              />
+            </div>
+
+            {/* Submit Vote */}
+            <button
+              type="submit"
+              disabled={!isVotingOpen}
+              className="h-12 w-full rounded-lg bg-[#2563EB] px-5 text-sm font-semibold text-white transition hover:bg-[#1D4ED8] focus:outline-none focus:ring-2 focus:ring-[#2563EB]/40 disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-500"
+            >
+              {isVotingOpen
+                ? "Submit Vote"
+                : "Voting Closed"}
+            </button>
+          </form>
         </div>
-      </main>
-    </div>
+
+        {/* Progress and Results */}
+        <div className="mx-auto mt-8 grid max-w-5xl gap-6 md:grid-cols-2">
+
+          {/* Voting Progress */}
+          <div className="rounded-2xl bg-white p-6 shadow-md ring-1 ring-gray-200">
+            <p className="text-sm font-semibold uppercase tracking-wide text-gray-500">
+              Voting Progress
+            </p>
+
+            <div className="mt-4 flex items-end justify-between">
+              <div>
+                <p className="text-4xl font-bold text-gray-900">
+                  {votedVoterIds.length} / 20
+                </p>
+
+                <p className="mt-1 text-sm text-gray-500">
+                  Votes Cast
+                </p>
+              </div>
+
+              <span
+                className={`rounded-full px-3 py-1 text-xs font-semibold ${
+                  isVotingOpen
+                    ? "bg-green-100 text-green-700"
+                    : "bg-red-100 text-red-700"
+                }`}
+              >
+                {isVotingOpen
+                  ? "Voting Open"
+                  : "Voting Closed"}
+              </span>
+            </div>
+
+            <div className="mt-5 h-2 overflow-hidden rounded-full bg-gray-200">
+              <div
+                className="h-full rounded-full bg-[#2563EB] transition-all duration-300"
+                style={{
+                  width: `${
+                    (votedVoterIds.length / 20) * 100
+                  }%`,
+                }}
+              />
+            </div>
+          </div>
+
+          {/* Current Results */}
+          <div className="rounded-2xl bg-white p-6 shadow-md ring-1 ring-gray-200">
+            <div>
+              <p className="text-sm font-semibold uppercase tracking-wide text-gray-500">
+                Current Results
+              </p>
+
+              <p className="mt-1 text-sm text-gray-500">
+                Live candidate scores
+              </p>
+            </div>
+
+            <div className="mt-5 space-y-3">
+              {candidates.length === 0 ? (
+                <div className="rounded-lg border border-dashed border-gray-300 p-6 text-center">
+                  <p className="text-sm text-gray-500">
+                    No votes have been cast yet.
+                  </p>
+                </div>
+              ) : (
+                candidates.map((candidate) => (
+                  <div
+                    key={candidate.name.toLowerCase()}
+                    className="flex items-center justify-between rounded-lg border border-gray-200 bg-gray-50 px-4 py-3"
+                  >
+                    <span className="font-medium text-gray-800">
+                      {candidate.name}
+                    </span>
+
+                    <span className="font-bold text-[#7C2D12]">
+                      {candidate.votes}{" "}
+                      {candidate.votes === 1
+                        ? "vote"
+                        : "votes"}
+                    </span>
+                  </div>
+                ))
+              )}
+            </div>
+
+            {/* View Winners */}
+            <div className="mt-8 flex justify-center">
+              <button
+                type="button"
+                disabled={isVotingOpen}
+                onClick={() =>
+                  setIsWinnerModalOpen(true)
+                }
+                className="rounded-lg px-8 py-3 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-500 enabled:bg-[#7C2D12] enabled:text-white enabled:hover:bg-[#65250F]"
+              >
+                View Winners
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Winners Modal */}
+      <WinnersModal
+        isOpen={isWinnerModalOpen}
+        onClose={() =>
+          setIsWinnerModalOpen(false)
+        }
+        winner={winner}
+        runnerUp={runnerUp}
+        hasTie={hasTie}
+      />
+    </section>
   );
 }
