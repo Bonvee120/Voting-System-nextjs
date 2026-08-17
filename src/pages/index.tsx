@@ -11,7 +11,7 @@ export default function Home() {
   const [isWinnerModalOpen, setIsWinnerModalOpen] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
 
-  // Load saved election data when the page opens
+  
   useEffect(() => {
     const savedCandidates = localStorage.getItem("electionCandidates");
     const savedVoterIds = localStorage.getItem("votedVoterIds");
@@ -27,7 +27,7 @@ export default function Home() {
     setIsLoaded(true);
   }, []);
 
-  // Save candidates whenever they change
+  
   useEffect(() => {
     if (!isLoaded) return;
 
@@ -37,7 +37,7 @@ export default function Home() {
     );
   }, [candidates, isLoaded]);
 
-  // Save voters who have voted whenever they change
+  
   useEffect(() => {
     if (!isLoaded) return;
 
@@ -130,7 +130,7 @@ export default function Home() {
     <section className="min-h-[calc(100vh-9rem)] px-6 py-12">
       <div className="mx-auto max-w-5xl">
 
-        {/* Page Heading */}
+        
         <div className="mb-10 text-center">
           <p className="mb-2 text-sm font-semibold uppercase tracking-widest text-[#7C2D12]">
             Africa Plan Foundation
@@ -145,7 +145,7 @@ export default function Home() {
           </p>
         </div>
 
-        {/* Voting Form */}
+        
         <div className="mx-auto max-w-2xl rounded-2xl bg-white p-6 shadow-lg ring-1 ring-gray-200 sm:p-8">
           <div className="mb-7">
             <h2 className="text-xl font-bold text-gray-900">
@@ -159,7 +159,7 @@ export default function Home() {
 
           <form onSubmit={handleVote} className="space-y-6">
 
-            {/* Voter */}
+      
             <div>
               <label
                 htmlFor="voter"
@@ -197,7 +197,7 @@ export default function Home() {
               </select>
             </div>
 
-            {/* Candidate */}
+            
             <div>
               <label
                 htmlFor="candidate"
@@ -219,7 +219,7 @@ export default function Home() {
               />
             </div>
 
-            {/* Submit Vote */}
+          
             <button
               type="submit"
               disabled={!isVotingOpen}
@@ -232,10 +232,10 @@ export default function Home() {
           </form>
         </div>
 
-        {/* Progress and Results */}
+      
         <div className="mx-auto mt-8 grid max-w-5xl gap-6 md:grid-cols-2">
 
-          {/* Voting Progress */}
+    
           <div className="rounded-2xl bg-white p-6 shadow-md ring-1 ring-gray-200">
             <p className="text-sm font-semibold uppercase tracking-wide text-gray-500">
               Voting Progress
@@ -277,7 +277,7 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Current Results */}
+        
           <div className="rounded-2xl bg-white p-6 shadow-md ring-1 ring-gray-200">
             <div>
               <p className="text-sm font-semibold uppercase tracking-wide text-gray-500">
@@ -317,7 +317,7 @@ export default function Home() {
               )}
             </div>
 
-            {/* View Winners */}
+            
             <div className="mt-8 flex justify-center">
               <button
                 type="button"
@@ -334,7 +334,7 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Winners Modal */}
+    
       <WinnersModal
         isOpen={isWinnerModalOpen}
         onClose={() =>
