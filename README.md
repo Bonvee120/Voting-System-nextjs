@@ -35,6 +35,9 @@ The application allows a fixed group of 20 voters to cast one vote each for a ca
 - **React Icons** — Icons
 - **localStorage** — Frontend persistence
 
+## Hosted by Vercel
+https://voting-system-nextjs-three.vercel.app/
+
 ## 📁 Project Structure
 
 ```text
