@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { voters } from "@/types/voters";
 import type { Candidate } from "@/types/voting";
 import WinnersModal from "@/components/voting/WinnersModal";
@@ -11,41 +11,7 @@ export default function Home() {
   const [isWinnerModalOpen, setIsWinnerModalOpen] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
 
-  
-  useEffect(() => {
-    const savedCandidates = localStorage.getItem("electionCandidates");
-    const savedVoterIds = localStorage.getItem("votedVoterIds");
 
-    if (savedCandidates) {
-      setCandidates(JSON.parse(savedCandidates));
-    }
-
-    if (savedVoterIds) {
-      setVotedVoterIds(JSON.parse(savedVoterIds));
-    }
-
-    setIsLoaded(true);
-  }, []);
-
-  
-  useEffect(() => {
-    if (!isLoaded) return;
-
-    localStorage.setItem(
-      "electionCandidates",
-      JSON.stringify(candidates)
-    );
-  }, [candidates, isLoaded]);
-
-  
-  useEffect(() => {
-    if (!isLoaded) return;
-
-    localStorage.setItem(
-      "votedVoterIds",
-      JSON.stringify(votedVoterIds)
-    );
-  }, [votedVoterIds, isLoaded]);
 
   const isVotingOpen = votedVoterIds.length < 20;
 
